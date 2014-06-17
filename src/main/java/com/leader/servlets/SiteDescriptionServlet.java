@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @WebServlet("/site")
@@ -28,10 +30,11 @@ public class SiteDescriptionServlet extends HttpServlet {
 
         ResponseProcessor responseProcessor = responseProcessorFactory(request);
         try {
-            Site sites = responseProcessor.getSiteBean();
+            List<Site> sites = new ArrayList<Site>();
+            sites.add(responseProcessor.getSiteBean());
             request.setAttribute("page", Page.page);
             request.setAttribute("pageType", Page.SITE_INFO_PAGE);
-            request.setAttribute("site_info", sites);
+            request.setAttribute("sites", sites);
             request.getRequestDispatcher(TemplateSettings.TEMPLATE_FILE_PATH).forward(request, response);
         }catch (SQLException e){
             // TODO error page
@@ -96,6 +99,8 @@ public class SiteDescriptionServlet extends HttpServlet {
                 }
 
                 site.setPictureURL(resultSet.getString("picture"));
+
+                site.setUrl(resultSet.getString("url"));
 
                 break;//i need only one site bean
             }

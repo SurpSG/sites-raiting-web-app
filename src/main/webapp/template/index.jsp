@@ -7,6 +7,8 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf8" />
 	<meta name="author" content="Andrey" />
+
+
     <script type="text/javascript" language="javascript" src="template/js/jquery.js"></script>
     <script type="text/javascript">
         $(document).ready(function()
@@ -25,8 +27,22 @@
 	       });
         });
 </script>
+
     <link rel="stylesheet" type="text/css" href="/template/css/style.css" />
-	<title>Lider</title>
+
+
+    <link href="template/css/jquery.rating.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        window.jQuery || document.write('<script type="text/javascript" src="template/js/jquery-1.6.2.min.js"><\/script>');
+    </script>
+
+    <script type="text/javascript" src="template/js/jquery.rating.min.js"></script>
+
+    <jsp:include page="HeaderScriptsForStarRating.jsp"/>
+
+    <title>Leader</title>
 </head>
 
 <body>
@@ -157,11 +173,11 @@
         <c:choose>
 
             <c:when test="${pageType == page.siteInfoPage}">
-                <jsp:include page="siteDescription.jsp"/>
+                <jsp:include page="siteDescriptionBody.jsp"/>
             </c:when>
 
             <c:when test="${pageType == page.listPage}">
-                <jsp:include page="siteList.jsp"/>
+                <jsp:include page="siteListBody.jsp"/>
             </c:when>
 
             <c:otherwise>
@@ -169,6 +185,17 @@
 
         </c:choose>
 
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-3866000-4']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
 
 
         <!--БЛОК РЕЙТИНГОВОГО ОКНА КОНТЕНТА конец-->
@@ -187,6 +214,9 @@
     </div>
     <!--ФУТЕР конец-->
 </div>
+
+
+
 
 </body>
 </html>

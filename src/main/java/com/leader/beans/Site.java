@@ -12,6 +12,7 @@ public class Site {
     private double rating;
     private String description;
     private String pictureURL;
+    private String url;
     private String shortDescription;
 
     public Site() {
@@ -21,7 +22,7 @@ public class Site {
         return name;
     }
 
-    public double getRaiting() {
+    public double getRating() {
         return rating;
     }
 
@@ -65,13 +66,25 @@ public class Site {
         return shortDescription;
     }
 
-    public static String createShortDescription(String description) {
-        String shortDescription = "";
-        if (description.length() < SHORT_DESCRITION_LENGTH) {
-            shortDescription = description;
-        } else {
-            shortDescription = description.substring(0, SHORT_DESCRITION_LENGTH);
+//    public static String createShortDescription(String description) {
+//        String shortDescription = "";
+//        if (description.length() < SHORT_DESCRITION_LENGTH) {
+//            shortDescription = description;
+//        } else {
+//            shortDescription = description.substring(0, SHORT_DESCRITION_LENGTH);
+//        }
+//        return shortDescription;
+//    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        if(url.startsWith("http")){
+            this.url = url;
+        }else{
+            this.url = "http:\\\\"+url;
         }
-        return shortDescription;
     }
 }

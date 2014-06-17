@@ -15,46 +15,27 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
-@WebServlet("")
-public class HomeServlet extends HttpServlet {
+@WebServlet("/rating")
+public class StarRatingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        request.getRemoteUser();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-
-        ResponseProcessor responseProcessor = responseProcessorFactory(request);
-        try {
-            List<Site> sites = responseProcessor.getListsOfSites();
-            request.setAttribute("page", Page.page);
-            request.setAttribute("pageType", Page.LIST_PAGE);
-            request.setAttribute("sites", sites);
-            request.getRequestDispatcher(TemplateSettings.TEMPLATE_FILE_PATH).forward(request, response);
-        }catch (SQLException e){
-            // TODO error page
-            e.printStackTrace();
-        }
+        request.getRequestDispatcher("template/index.html").forward(request, response);
     }
 
     private ResponseProcessor responseProcessorFactory(HttpServletRequest request) {
-        Map parameters = request.getParameterMap();
-
-        if (parameters.size() > 0) {
-            return new CategoryProcessor(request);
-        }
-
-        return new ListItemsProcessor(request);
+//        Map parameters = request.getParameterMap();
+        return new SiteDescriptionProcessor(request);
     }
 
     private abstract class ResponseProcessor {
-
-        protected static final int MAX_ITEMS_PER_PAGE = 10;
 
         protected HttpServletRequest request;
 
@@ -85,82 +66,60 @@ public class HomeServlet extends HttpServlet {
             return stmt.executeQuery(query);
         }
 
-        List<Site> getListsOfSites() throws SQLException {
+        Site getSiteBean() throws SQLException {
 
-            List<Site> sites = new ArrayList<Site>();
+            Site site = new Site();
 
             Connection connection = getConnection();
 
             ResultSet resultSet = performDBQuery(getQuery(), connection);
             while (resultSet.next()) {
 
-                Site site = new Site();
                 site.setId(resultSet.getInt("Id"));
                 site.setName(resultSet.getString("name"));
                 site.setRating(resultSet.getDouble("rating"));
 
-                Object description = resultSet.getObject("short_description");
+                Object description = resultSet.getObject("description");
                 if (description != null) {
-                    site.setShortDescription(description.toString());
+                    site.setDescription(description.toString());
                 } else {
-                    site.setShortDescription("no description yet");
+                    site.setDescription("no description");
                 }
 
                 site.setPictureURL(resultSet.getString("picture"));
 
-                sites.add(site);
+                site.setUrl(resultSet.getString("url"));
+
+                break;//i need only one site bean
             }
 
             connection.close();
 
-            return sites;
+            return site;
         }
     }
 
-    private class CategoryProcessor extends ResponseProcessor {
+    private class SiteDescriptionProcessor extends ResponseProcessor {
 
-        private static final String CATEGORY_URL_PARAM_NAME = "category";
+        private static final String ID_PARAM_NAME = "id";
         private String query;
 
-        public CategoryProcessor(HttpServletRequest request) {
+        public SiteDescriptionProcessor(HttpServletRequest request) {
             super(request);
 
-            query = createQuery(parseCategoryIdFromURL(request));
+            query = createQuery(parseSiteIdFromURL(request));
         }
 
-        private int parseCategoryIdFromURL(HttpServletRequest request){
-            String stringId = request.getParameter(CATEGORY_URL_PARAM_NAME);
+        private int parseSiteIdFromURL(HttpServletRequest request){
+            String stringId = request.getParameter(ID_PARAM_NAME);
             return Integer.parseInt(stringId);//TODO null pointer
         }
 
-        private String createQuery(int categoryId) {
-            String query ="SELECT sites.*, category_site.* " +//TODO description is not necessary for this page. only short description
+        private String createQuery(int siteId) {
+            String query ="SELECT sites.*" +
                     " FROM sites" +
-                    " left outer JOIN category_site ON category_site.site_id = sites.Id" +
-                    " where category_id = "+categoryId+" "
-                +"ORDER BY rating "
-                +"LIMIT " + MAX_ITEMS_PER_PAGE;
-
+                    " where id = "+siteId;
             return query;
-        }
-
-        @Override
-        protected String getQuery() {
-            return query;
-        }
-    }
-
-    private class ListItemsProcessor extends ResponseProcessor {
-
-        private String query;
-
-        public ListItemsProcessor(HttpServletRequest request) {
-            super(request);
-            query = createQuery();
-        }
-
-        private String createQuery() {
-            return "SELECT * FROM sites ORDER BY rating DESC LIMIT " + MAX_ITEMS_PER_PAGE;
         }
 
         @Override
