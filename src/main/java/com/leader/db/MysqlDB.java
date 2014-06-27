@@ -1,5 +1,9 @@
 package com.leader.db;
 
+import com.leader.settings.DBSettings;
+
+import java.sql.Connection;
+
 /**
  * Created by ruki on 24.04.2014.
  */

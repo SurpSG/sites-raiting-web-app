@@ -38,7 +38,7 @@
         window.jQuery || document.write('<script type="text/javascript" src="template/js/jquery-1.6.2.min.js"><\/script>');
     </script>
 
-    <script type="text/javascript" src="template/js/jquery.rating.min.js"></script>
+    <script type="text/javascript" src="template/js/jquery.rating.js"></script>
 
     <jsp:include page="HeaderScriptsForStarRating.jsp"/>
 

@@ -14,8 +14,19 @@ public class Site {
     private String pictureURL;
     private String url;
     private String shortDescription;
+    private int votes;
+
+    private double currentUserRating;
 
     public Site() {
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
     }
 
     public String getName() {
@@ -56,6 +67,14 @@ public class Site {
 
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
+    }
+
+    public double getCurrentUserRating() {
+        return currentUserRating;
+    }
+
+    public void setCurrentUserRating(double currentUserRating) {
+        this.currentUserRating = currentUserRating;
     }
 
     public String getPictureURL() {

@@ -22,8 +22,8 @@
                 <div class="wrap">
                     <div id="rating_<c:out value="${site.id}" />">
                         <input type="hidden" class="val" value="<c:out value="${site.rating}"/>"/>
-                        <input type="hidden" class="votes" value="2"/>
-                        <input type="hidden" class="vote-id" value="voteID"/>
+                        <input type="hidden" class="votes" value="<c:out value="${site.votes}"/>"/>
+                        <input type="hidden" class="vote-id" value="<c:out value="${site.id}" />"/>
                     </div>
                 </div>
 

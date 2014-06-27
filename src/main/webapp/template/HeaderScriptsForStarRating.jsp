@@ -18,7 +18,8 @@
                 image: 'template/images/stars.png',
                 loader: 'template/images/ajax-loader.gif',
                 width: 32,
-                url: 'rating.php'
+                url: '/rating',
+                readOnly: <c:out value="${site.currentUserRating>0}"/>//todo
             });
 
         })

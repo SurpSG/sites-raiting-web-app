@@ -1,130 +1,91 @@
 package com.leader.servlets;
 
-import com.leader.beans.Site;
 import com.leader.db.DBController;
 import com.leader.db.MysqlDB;
-import com.leader.settings.TemplateSettings;
+import com.leader.settings.DBSettings;
+import org.json.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
+import java.io.PrintWriter;
+import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @WebServlet("/rating")
 public class StarRatingServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        request.getRemoteUser();
-    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
-        request.getRequestDispatcher("template/index.html").forward(request, response);
     }
 
-    private ResponseProcessor responseProcessorFactory(HttpServletRequest request) {
-//        Map parameters = request.getParameterMap();
-        return new SiteDescriptionProcessor(request);
+
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
+        response.setContentType("application/json");
+        response.setHeader("Cache-Control", "nocache");
+        response.setCharacterEncoding("utf-8");
+        PrintWriter out = response.getWriter();
+
+        int siteID = Integer.parseInt(request.getParameter("id"));
+        double score = Integer.parseInt(request.getParameter("score"));
+
+        int userID = getUserID(request);
+
+        double newScore = vote(userID, siteID, score);
+        int voteDelta = 1;
+
+        if(newScore<0){
+            newScore*=-1;
+            voteDelta = 0;
+        }
+
+        Map<String, String> jsonMap = new LinkedHashMap<String, String>();
+        jsonMap.put("status", "OK");
+        jsonMap.put("score", ""+newScore);
+        jsonMap.put("votes", ""+voteDelta);
+
+
+        JSONObject jsonObject = new JSONObject(jsonMap);
+
+        out.print(jsonObject);
     }
+    private double vote(int userID, int siteID, double score){
 
-    private abstract class ResponseProcessor {
-
-        protected HttpServletRequest request;
-
-        public ResponseProcessor(HttpServletRequest request) {
-            this.request = request;
-        }
-
-        /**
-         * @return query according to GET parameters
-         */
-        protected abstract String getQuery();
-
-        /**
-         * @return connection according to database
-         */
-        private Connection getConnection() {
-            DBController db = new MysqlDB("leaderdb", "root", "root", "127.0.0.1", 3307);
-            return db.getConnection();
-        }
-
-        /**
-         * @param query query to execute
-         * @param connection connection object to database
-         * @return result set
-         */
-        protected ResultSet performDBQuery(String query, Connection connection) throws SQLException {
-            Statement stmt = connection.createStatement();
-            return stmt.executeQuery(query);
-        }
-
-        Site getSiteBean() throws SQLException {
-
-            Site site = new Site();
-
+        String query = "{?= call vote(?,?,?)}";
+        try {
             Connection connection = getConnection();
 
-            ResultSet resultSet = performDBQuery(getQuery(), connection);
-            while (resultSet.next()) {
+            CallableStatement callableStatement = connection.prepareCall(query);
+            callableStatement.registerOutParameter(1, java.sql.Types.DOUBLE);
+            callableStatement.setInt(2, siteID);
+            callableStatement.setInt(3, userID);
+            callableStatement.setDouble(4, score);
 
-                site.setId(resultSet.getInt("Id"));
-                site.setName(resultSet.getString("name"));
-                site.setRating(resultSet.getDouble("rating"));
+            callableStatement.executeUpdate();
 
-                Object description = resultSet.getObject("description");
-                if (description != null) {
-                    site.setDescription(description.toString());
-                } else {
-                    site.setDescription("no description");
-                }
-
-                site.setPictureURL(resultSet.getString("picture"));
-
-                site.setUrl(resultSet.getString("url"));
-
-                break;//i need only one site bean
-            }
-
-            connection.close();
-
-            return site;
+            return callableStatement.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return -1.0;
     }
 
-    private class SiteDescriptionProcessor extends ResponseProcessor {
-
-        private static final String ID_PARAM_NAME = "id";
-        private String query;
-
-        public SiteDescriptionProcessor(HttpServletRequest request) {
-            super(request);
-
-            query = createQuery(parseSiteIdFromURL(request));
-        }
-
-        private int parseSiteIdFromURL(HttpServletRequest request){
-            String stringId = request.getParameter(ID_PARAM_NAME);
-            return Integer.parseInt(stringId);//TODO null pointer
-        }
-
-        private String createQuery(int siteId) {
-            String query ="SELECT sites.*" +
-                    " FROM sites" +
-                    " where id = "+siteId;
-            return query;
-        }
-
-        @Override
-        protected String getQuery() {
-            return query;
-        }
+    private Connection getConnection() {
+        DBController db = new MysqlDB(DBSettings.DB_NAME, "root", "root", DBSettings.DB_URL, DBSettings.DB_PORT);//TODO create another user not root
+        return db.getConnection();
     }
+
+    private int getUserID(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        return Integer.parseInt(session.getAttribute(UserFilter.SESSION_USER_ID_KEY).toString());
+    }
+
 }
