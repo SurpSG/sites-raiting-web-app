@@ -47,6 +47,9 @@ public class StarRatingServlet extends HttpServlet {
             voteDelta = 0;
         }
 
+        newScore = (double)Math.round(newScore * 100) / 100;
+
+
         Map<String, String> jsonMap = new LinkedHashMap<String, String>();
         jsonMap.put("status", "OK");
         jsonMap.put("score", ""+newScore);
@@ -57,7 +60,8 @@ public class StarRatingServlet extends HttpServlet {
 
         out.print(jsonObject);
     }
-    private double vote(int userID, int siteID, double score){
+
+    private synchronized double vote(int userID, int siteID, double score){
 
         String query = "{?= call vote(?,?,?)}";
         try {

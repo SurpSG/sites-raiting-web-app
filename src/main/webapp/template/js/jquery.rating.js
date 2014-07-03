@@ -23,6 +23,7 @@
 			url: '',
             type: 'post',
             loader: '/images/ajax-loader.gif',
+            userScore:0,
 			click: function(){}
 		}, o || {});
 		
@@ -46,7 +47,7 @@
 		this.vote_active = $('<div class="vote-active"></div>');
 		this.vote_result = $('<div class="vote-result"></div>');
         if(this.options.readOnly){
-            this.vote_success = $('<div class="vote-success">'+your_score_message+'</div>');
+            this.vote_success = $('<div class="vote-success">'+your_score_message+this.options.userScore+'</div>');
         }else{
             this.vote_success = $('<div class="vote-success">'+please_vote_message+'</div>');
         }
@@ -195,7 +196,7 @@
 		            if(data.status == 'OK') {
 
                       self.val = data.score;// (self.val*self.votes +score)/(self.votes + 1);
-
+                      $('#current_rating').text(data.score);
                       self.vote_success.html(data.score+" score");
                       self.votes=self.votes+parseInt(data.votes);
 		              self.set();

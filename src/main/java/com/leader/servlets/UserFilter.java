@@ -15,6 +15,7 @@ import java.io.IOException;
 public class UserFilter implements Filter {
 
     public static final String SESSION_USER_ID_KEY = "id";
+    public static final String REQUEST_USER_ID_KEY = "id";
 
     private static final int TTL = 60 * 60 * 24 * 7;// one week in seconds
 
@@ -38,7 +39,7 @@ public class UserFilter implements Filter {
         User user = new User(userIP);
 
         session.setAttribute(SESSION_USER_ID_KEY,user.getId());
-
+        request.setAttribute(""+REQUEST_USER_ID_KEY,user.getId());
         return session;
     }
 
@@ -47,6 +48,8 @@ public class UserFilter implements Filter {
 
         if(session == null){
             initNewSession(request);
+        }else{
+            request.setAttribute(""+REQUEST_USER_ID_KEY, Integer.parseInt(session.getAttribute(SESSION_USER_ID_KEY)+""));
         }
     }
 

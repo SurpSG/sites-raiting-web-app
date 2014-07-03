@@ -19,7 +19,8 @@
                 loader: 'template/images/ajax-loader.gif',
                 width: 32,
                 url: '/rating',
-                readOnly: <c:out value="${site.currentUserRating>0}"/>//todo
+                readOnly: <c:out value="${site.currentUserRating>0}"/>,
+                userScore:<c:out value="${site.currentUserRating}"/>
             });
 
         })

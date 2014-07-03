@@ -1,5 +1,6 @@
 package com.leader.servlets;
 
+import com.leader.bean_processor.SiteBeanProcessor;
 import com.leader.beans.Site;
 import com.leader.db.DBController;
 import com.leader.db.MysqlDB;
@@ -21,17 +22,18 @@ import java.util.List;
 
 @WebServlet("/site")
 public class SiteDescriptionServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
+    private int userID;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-
+        userID = Integer.parseInt(request.getAttribute(UserFilter.REQUEST_USER_ID_KEY).toString());
         ResponseProcessor responseProcessor = responseProcessorFactory(request);
         try {
-            List<Site> sites = new ArrayList<Site>();
-            sites.add(responseProcessor.getSiteBean());
+            String query = responseProcessor.getQuery();
+            List<Site> sites = SiteBeanProcessor.getSiteBean(query);
             request.setAttribute("page", Page.page);
             request.setAttribute("pageType", Page.SITE_INFO_PAGE);
             request.setAttribute("sites", sites);
@@ -59,56 +61,6 @@ public class SiteDescriptionServlet extends HttpServlet {
          * @return query according to GET parameters
          */
         protected abstract String getQuery();
-
-        /**
-         * @return connection according to database
-         */
-        private Connection getConnection() {
-            DBController db = new MysqlDB("leaderdb", "root", "root", "127.0.0.1", 3307);
-            return db.getConnection();
-        }
-
-        /**
-         * @param query query to execute
-         * @param connection connection object to database
-         * @return result set
-         */
-        protected ResultSet performDBQuery(String query, Connection connection) throws SQLException {
-            Statement stmt = connection.createStatement();
-            return stmt.executeQuery(query);
-        }
-
-        Site getSiteBean() throws SQLException {
-
-            Site site = new Site();
-
-            Connection connection = getConnection();
-
-            ResultSet resultSet = performDBQuery(getQuery(), connection);
-            while (resultSet.next()) {
-
-                site.setId(resultSet.getInt("Id"));
-                site.setName(resultSet.getString("name"));
-                site.setRating(resultSet.getDouble("rating"));
-
-                Object description = resultSet.getObject("description");
-                if (description != null) {
-                    site.setDescription(description.toString());
-                } else {
-                    site.setDescription("no description");
-                }
-
-                site.setPictureURL(resultSet.getString("picture"));
-
-                site.setUrl(resultSet.getString("url"));
-
-                break;//i need only one site bean
-            }
-
-            connection.close();
-
-            return site;
-        }
     }
 
     private class SiteDescriptionProcessor extends ResponseProcessor {
@@ -128,9 +80,12 @@ public class SiteDescriptionServlet extends HttpServlet {
         }
 
         private String createQuery(int siteId) {
-            String query ="SELECT sites.*" +
-                    " FROM sites" +
-                    " where id = "+siteId;
+            String query ="select t1.score,sites.*\n" +
+                    "from\n" +
+                    "(\n" +
+                    "    select user_site.* from user_site where user_site.user_id="+userID+"\n" +
+                    ") t1\n" +
+                    "right join sites on t1.site_id=sites.id where sites.id = "+siteId;
             return query;
         }
 

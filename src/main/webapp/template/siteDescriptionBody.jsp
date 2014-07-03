@@ -17,20 +17,20 @@
     <div class="head_text"><c:out value="${site.name}"/>
     </div>
 
-    <a href="${site.url}"><div class="go_button">перейти</div></a>
+    <a href="${site.url}" target="_blank"><div class="go_button">перейти</div></a>
 
     <br>
 
     <div class="border-wrap">
         <div id="rating_<c:out value="${site.id}" />">
             <input type="hidden" class="val" value="<c:out value="${site.rating}"/>"/>
-            <input type="hidden" class="votes" value="2"/>
+            <input type="hidden" class="votes" value="<c:out value="${site.votes}"/>"/>
             <input type="hidden" class="vote-id" value="<c:out value="${site.id}"/>"/>
         </div>
     </div>
 
     <div class="info_block">
-        Рейтинг: <c:out value="${site.rating}"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Відвідуваність:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Яндекс:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Гугл:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Рейтинг: <span id="current_rating"><c:out value="${site.rating}"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Відвідуваність:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Яндекс:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Гугл:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
     <br>
 

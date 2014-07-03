@@ -1,5 +1,6 @@
 package com.leader.servlets;
 
+import com.leader.bean_processor.SiteBeanProcessor;
 import com.leader.beans.Site;
 import com.leader.db.DBController;
 import com.leader.db.MysqlDB;
@@ -33,10 +34,12 @@ public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-        userID = getUserID(request);
+        userID = Integer.parseInt(request.getAttribute(UserFilter.REQUEST_USER_ID_KEY).toString());
         ResponseProcessor responseProcessor = responseProcessorFactory(request);
         try {
-            List<Site> sites = responseProcessor.getListsOfSites();
+            String query = responseProcessor.getQuery();
+
+            List<Site> sites = SiteBeanProcessor.getSiteBeans(query);
             request.setAttribute("page", Page.page);
             request.setAttribute("pageType", Page.LIST_PAGE);
             request.setAttribute("sites", sites);
@@ -45,11 +48,6 @@ public class HomeServlet extends HttpServlet {
             // TODO error page
             e.printStackTrace();
         }
-    }
-
-    private int getUserID(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
-        return Integer.parseInt(session.getAttribute(UserFilter.SESSION_USER_ID_KEY).toString());
     }
 
     private ResponseProcessor responseProcessorFactory(HttpServletRequest request) {
@@ -76,62 +74,11 @@ public class HomeServlet extends HttpServlet {
          * @return query according to GET parameters
          */
         protected abstract String getQuery();
-
-        /**
-         * @return connection according to database
-         */
-        private Connection getConnection() {
-            DBController db = new MysqlDB("leaderdb", "root", "root", "127.0.0.1", 3307);
-            return db.getConnection();
-        }
-
-        /**
-         * @param query query to execute
-         * @param connection connection object to database
-         * @return result set
-         */
-        protected ResultSet performDBQuery(String query, Connection connection) throws SQLException {
-            Statement stmt = connection.createStatement();
-            return stmt.executeQuery(query);
-        }
-
-        List<Site> getListsOfSites() throws SQLException {
-
-            List<Site> sites = new ArrayList<Site>();
-
-            Connection connection = getConnection();
-
-            ResultSet resultSet = performDBQuery(getQuery(), connection);
-            while (resultSet.next()) {
-
-                Site site = new Site();
-                site.setId(resultSet.getInt("Id"));
-                site.setName(resultSet.getString("name"));
-                site.setRating(resultSet.getDouble("rating"));
-                site.setVotes(resultSet.getInt("votes"));
-
-                Double userScore =  resultSet.getDouble("score");
-                userScore = (userScore == null)? 0 : userScore;
-                site.setCurrentUserRating(userScore);
-
-                Object description = resultSet.getObject("short_description");
-                if (description != null) {
-                    site.setShortDescription(description.toString());
-                } else {
-                    site.setShortDescription("no description yet");
-                }
-
-                site.setPictureURL(resultSet.getString("picture"));
-
-                sites.add(site);
-            }
-
-            connection.close();
-
-            return sites;
-        }
     }
 
+    /**
+     *
+     */
     private class CategoryProcessor extends ResponseProcessor {
 
         private static final String CATEGORY_URL_PARAM_NAME = "category";
@@ -149,16 +96,6 @@ public class HomeServlet extends HttpServlet {
         }
 
         private String createQuery(int categoryId) {
-            /*
-
-
-    select user_site.* from user_site where user_site.user_id=97
-) t1
-right join sites on t1.site_id=sites.id
-left  JOIN category_site ON category_site.site_id = sites.Id
-    where category_site.category_id = 3 ;
-
-             */
             String query =
                     "SELECT " +
                             "t1.score, " +
@@ -182,6 +119,9 @@ left  JOIN category_site ON category_site.site_id = sites.Id
         }
     }
 
+    /**
+     *
+     */
     private class ListItemsProcessor extends ResponseProcessor {
 
         private String query;
