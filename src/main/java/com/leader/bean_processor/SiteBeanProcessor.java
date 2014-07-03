@@ -19,6 +19,9 @@ import java.util.List;
  */
 public class SiteBeanProcessor {
 
+    private int pagesNumber;
+
+
     private static List<Site> getSites(String query, boolean all) throws SQLException {
 
         List<Site> sites = new ArrayList<Site>();
@@ -67,6 +70,19 @@ public class SiteBeanProcessor {
         connection.close();
 
         return sites;
+    }
+
+    public static int getSitesNumber(String query) {
+        Connection connection = getConnection();
+        try {
+            ResultSet resultSet = performDBQuery(query,connection);
+            while (resultSet.next()){
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public static List<Site> getSiteBean(String query) throws SQLException {

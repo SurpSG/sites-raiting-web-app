@@ -36,6 +36,8 @@
             </div>
 
         </div>
-
-
     </c:forEach>
+
+<c:forEach var="i" begin="1" end="${page_number}">
+    <a href="?page=<c:out value="${i}"/><c:out value="${category}"/>"><c:out value=".${i}."/></a>
+</c:forEach>
