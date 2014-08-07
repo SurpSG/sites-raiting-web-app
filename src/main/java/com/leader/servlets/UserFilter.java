@@ -1,6 +1,6 @@
 package com.leader.servlets;
 
-import com.leader.beans.User;
+import com.leader.beans.UserBean;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -24,7 +24,7 @@ public class UserFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
-
+        System.out.println("UserFilter");
         checkSession(request);
 
         chain.doFilter(req, resp);
@@ -36,7 +36,7 @@ public class UserFilter implements Filter {
 
         String userIP = getClientIpAddr(request);
 
-        User user = new User(userIP);
+        UserBean user = new UserBean(userIP);
 
         session.setAttribute(SESSION_USER_ID_KEY,user.getId());
         request.setAttribute(""+REQUEST_USER_ID_KEY,user.getId());

@@ -20,7 +20,7 @@
             $(this).siblings().css({backgroundImage:"url(left.png)"});
 	       });
         	//slides the element with class "menu_body" when mouse is over the paragraph
-	       $("#secondpane p.menu_head").mouseover(function()
+	       $("#secondpane p.menu_head").click(function()
             {
 	           $(this).css({backgroundImage:"url(down.png)"}).next("div.menu_body").slideDown(500).siblings("div.menu_body").slideUp("slow");
                 $(this).siblings().css({backgroundImage:"url(left.png)"});
@@ -103,26 +103,39 @@
     </div>
     <!--ГОРИЗОНТАЛЬНОЕ МЕНЮ конец-->
     <!--ЛЕВОЕ ВЕРТИКАЛЬНОЕ МЕНЮ начало-->
+
+
     <div class="left_menu">
         <div style="float:left; margin-left:20px;"> <!--This is the second division of right-->
-    <div class="menu_list" id="secondpane"> <!--Code for menu starts here-->
-		<p class="menu_head">Мультимедія</p>
+            <div class="menu_list" id="secondpane"> <!--Code for menu starts here-->
+    <jsp:include page="leftMenu.jsp"/>
+
+            </div>      <!--Code for menu ends here-->
+        </div>
+    </div>
+
+    <!--
+       <div class="left_menu">
+           <div style="float:left; margin-left:20px;">
+    <div class="menu_list" id="secondpane1">
 		<div class="menu_body">
 		<a href="#">Музика</a>
          <a href="#">Фільми</a>
          <a href="#">Кліпи</a>	
 		</div>
-		<p class="menu_head">Ігри</p>
+
+        <p class="menu_head">Ігри</p>
 		<div class="menu_body">
-			<a href="#">Link-1</a>
-         <a href="#">Link-2</a>
-         <a href="#">Link-3</a>	
+		    <a href="#">Link-1</a>
+            <a href="#">Link-2</a>
+            <a href="#">Link-3</a>
 		</div>
+
 		<p class="menu_head">Книги</p>
 		<div class="menu_body">
           <a href="#">Link-1</a>
          <a href="#">Link-2</a>
-         <a href="#">Link-3</a>			
+         <a href="#">Link-3</a>
        </div>
        <p class="menu_head">Інтернет магазини</p>
 		<div class="menu_body">
@@ -154,9 +167,9 @@
          <a href="#">Link-2</a>
          <a href="#">Link-3</a>			
        </div>
-  </div>      <!--Code for menu ends here-->
+  </div>
 </div>
-    </div>
+    </div>-->
     <!--ЛЕВОЕ ВЕРТИКАЛЬНОЕ МЕНЮ конец-->
     <!--ПРАВОЕ ВЕРТИКАЛЬНОЕ МЕНЮ начало-->
     <div class="right_menu">

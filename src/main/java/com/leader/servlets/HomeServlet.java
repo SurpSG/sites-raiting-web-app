@@ -1,6 +1,7 @@
 package com.leader.servlets;
 
 import com.leader.bean_processor.SiteBeanProcessor;
+import com.leader.beans.Category;
 import com.leader.beans.Site;
 import com.leader.settings.DBSettings;
 import com.leader.settings.TemplateSettings;
@@ -48,7 +49,7 @@ public class HomeServlet extends HttpServlet {
     private DefaultResponseProcessor responseProcessorFactory(HttpServletRequest request) {
 
         Map parameters =request.getParameterMap();
-        if (parameters.get(CategoryProcessor.CATEGORY_URL_PARAM_NAME)!=null) {
+        if (parameters.get(Category.CATEGORY_PARAM_NAME)!=null) {
             return new CategoryProcessor(request);
         }
 
@@ -126,10 +127,8 @@ public class HomeServlet extends HttpServlet {
      */
     private class CategoryProcessor extends DefaultResponseProcessor {
 
-        static final String CATEGORY_URL_PARAM_NAME = "category";
-
         private String sitesQuery;
-        private String sitesNumberQery;
+        private String sitesNumberQuery;
         public CategoryProcessor(HttpServletRequest request) {
             super(request);
 
@@ -137,11 +136,11 @@ public class HomeServlet extends HttpServlet {
         }
 
         private int parseCategoryIdFromURL(HttpServletRequest request){
-            String stringId = request.getParameter(CATEGORY_URL_PARAM_NAME);
+            String stringId = request.getParameter(Category.CATEGORY_PARAM_NAME);
             try {
                 int categoryID =Integer.parseInt(stringId);
                 if(categoryID > 0){
-                    request.setAttribute(CATEGORY_URL_PARAM_NAME, "&"+CATEGORY_URL_PARAM_NAME+"="+categoryID);
+                    request.setAttribute(Category.CATEGORY_PARAM_NAME, "&"+Category.CATEGORY_PARAM_NAME+"="+categoryID);
                     return categoryID;
                 }else{
                     throw new Exception("invalid category ID in URL");
@@ -156,10 +155,10 @@ public class HomeServlet extends HttpServlet {
             int categoryID = parseCategoryIdFromURL(request);
             if(categoryID>0){
                 sitesQuery = createQueryForSites(categoryID);
-                sitesNumberQery = createQueryForSitesNumber(categoryID);
+                sitesNumberQuery = createQueryForSitesNumber(categoryID);
             }else{
                 sitesQuery = super.getQuery();
-                sitesNumberQery = super.getSitesNumberQuery();
+                sitesNumberQuery = super.getSitesNumberQuery();
             }
         }
 
@@ -195,7 +194,7 @@ public class HomeServlet extends HttpServlet {
 
         @Override
         public String getSitesNumberQuery(){
-            return sitesNumberQery;
+            return sitesNumberQuery;
         }
     }
 }
